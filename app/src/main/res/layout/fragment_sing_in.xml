@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginVertical="15dp"
+    tools:context=".ui.fragment.SingInFragment">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/siInputEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:errorEnabled="true"
+        android:textColorHint="@color/grey">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_mail_black_24dp"
+            android:drawablePadding="10dp"
+            android:textSize="20sp"
+            android:inputType="textEmailAddress"
+            android:hint="Correo Electronico"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/siInputPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:passwordToggleEnabled="true"
+        app:errorEnabled="true"
+        android:textColorHint="@color/grey">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_enhanced_encryption_black_24dp"
+            android:drawablePadding="10dp"
+            android:textSize="20sp"
+            android:inputType="textPassword"
+            android:hint="Contraseña"/>
+
+        <TextView
+            android:id="@+id/siTxtRecover"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Olvido su contraseña?"
+            android:layout_gravity="end"
+            android:textColor="@color/colorPrimary"
+            android:textSize="17sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/siBtnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginHorizontal="80dp"
+        android:textSize="22sp"
+        android:padding="15dp"
+        android:text="Ingresar" />
+
+</LinearLayout>
