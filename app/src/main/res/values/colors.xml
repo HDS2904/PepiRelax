@@ -7,4 +7,6 @@
     <color name="black">#000</color>
     <color name="green">#0d0</color>
     <color name="grey">#888</color>
+    <color name="orangeBlack">#C8840D</color>
+    <color name="yellowBlack">#CB604126</color>
 </resources>

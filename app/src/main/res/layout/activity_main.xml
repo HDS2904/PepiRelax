@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.LoginActivity">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/login_background">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,28 +27,52 @@
                 android:src="@drawable/icon_gamer" />
 
             <TextView
+                android:id="@+id/itemActivity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Bienvenido"
-                android:textColor="@color/colorPrimary"
-                android:textSize="30sp"
+                android:textScaleX="1.5"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textColor="@color/yellowBlack"
+                android:textSize="35sp"
                 android:gravity="center"/>
 
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/menuSing"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/containerButtonSing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:menu="@menu/menu_sing"
-                android:background="@color/colorAccent" />
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSingUp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Sing Up"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnSingIn" />
+
+                <Button
+                    android:id="@+id/btnSingIn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Sing In"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btnSingUp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <FrameLayout
                 android:id="@+id/fragmentHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/menuSing" />
+                android:layout_below="@id/containerButtonSing" />
 
         </LinearLayout>
 
     </ScrollView>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

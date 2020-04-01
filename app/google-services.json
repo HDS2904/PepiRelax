@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "54302527892",
+    "firebase_url": "https://pepirelax-c1726.firebaseio.com",
+    "project_id": "pepirelax-c1726",
+    "storage_bucket": "pepirelax-c1726.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:54302527892:android:ed44ef82a0b74db67aff81",
+        "android_client_info": {
+          "package_name": "com.example.pepirelax"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "54302527892-ih5loh1ar51t4e8ebf1bb23kn3pulujh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pepirelax",
+            "certificate_hash": "48e0571ff420bf7492fbc4a4597eb9c23349fdcb"
+          }
+        },
+        {
+          "client_id": "54302527892-95np4taelj3epl2b14b3u73hn0rth9g8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3aQFPjiimQuNkYIN9IPLkMYR8hIlBxX4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "54302527892-95np4taelj3epl2b14b3u73hn0rth9g8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
