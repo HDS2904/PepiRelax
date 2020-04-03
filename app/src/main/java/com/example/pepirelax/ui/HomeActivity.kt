@@ -8,14 +8,12 @@ import android.view.View
 import android.widget.Toast
 import com.example.pepirelax.R
 import com.example.pepirelax.model.Jugada
-import com.example.pepirelax.ui.fragment.GameActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_home.*
-import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -23,7 +21,7 @@ class HomeActivity : AppCompatActivity() {
     lateinit var uid: String    //ide del jugador actual
     lateinit var firebaseAuth:FirebaseAuth
     lateinit var dbs: FirebaseFirestore
-    lateinit var listenerRegistration: ListenerRegistration
+    private var listenerRegistration: ListenerRegistration? = null
 
     var jugadaId: String = ""
 
@@ -57,6 +55,8 @@ class HomeActivity : AppCompatActivity() {
 
     private fun buscarPartida(){
         textViewJugadas.text = "Buscando una Partida Libre"
+        animation_view.playAnimation()
+
         dbs.collection("jugadas")
             .whereEqualTo("jugadorDosId","")
             .get()
@@ -64,20 +64,71 @@ class HomeActivity : AppCompatActivity() {
                 if(it.result?.size() == 0){
                     crearNuevaJugada()
                 }else {
-                    val docJugada: DocumentSnapshot = it.result?.documents!!.get(0) //observacion de null
-                    jugadaId = docJugada.id
-                    val jugada: Jugada = docJugada.toObject(Jugada::class.java)!! //operacion posible null
-                    jugada.jugadorDosId = uid
+                    var encontrado: Boolean = false
+                    for(docJugada: DocumentSnapshot in it.result?.documents!!){
+                        if(docJugada.get("jugadorUnoId") != uid){
+                            encontrado = true
+                            //val docJugada: DocumentSnapshot = it.result?.documents!![0] //observacion de null
+                            jugadaId = docJugada.id
+                            /*
+                            val a1 = (docJugada.data?.get("jugadorUnoId") ?:"" ) as String
+                            val a2 = (docJugada.data?.get("JugadorDosId") ?:"" ) as String
+                            val a3: String =  docJugada.data?.get("selectedCells").toString()
 
-                    dbs.collection("jugadas")
-                        .document(jugadaId)
-                        .set(jugada)
-                        .addOnSuccessListener {
-                            startGame()
+                            val items = a3.replace("\\[".toRegex(), "").replace("\\]".toRegex(), "").split(", ").toTypedArray()
+                            val res: ArrayList<Int> = arrayListOf()
+                            for (i in items.indices) {
+                                res.add(Integer.parseInt(items[i]))
+                            }
+
+                            val a4 = docJugada.data?.get("turnoJugadorUno") as Boolean
+                            val a5 = (docJugada.data?.get("ganadorId") ?:"" ) as String
+                            val a6 = docJugada.data?.get("created") as Timestamp
+                            val a7: Boolean = docJugada.data?.get("goOut") as Boolean
+
+                            val jugada: Jugada = Jugada(a1, a2, res, a4, a5, a6, a7)
+
+                            //val jugada: Jugada? = docJugada.toObject(Jugada::class.java) //operacion posible null
+                            jugada.jugadorDosId = uid*/
+                            dbs.collection("jugadas")
+                                .document(jugadaId)
+                                .update("jugadorDosId",uid)
+                                .addOnSuccessListener {
+                                    textViewJugadas.text = "¡Partida encontrada! Se iniciará la partida"
+
+                                    animation_view.repeatCount = 0
+                                    animation_view.setAnimation("checked_animation.json")
+                                    animation_view.playAnimation()
+
+                                    val handler = Handler()
+                                    val r: Runnable = Runnable {
+                                        startGame()
+                                    }
+                                    handler.postDelayed(r,2000)
+                                }
+                                .addOnFailureListener {
+                                    changeMenuVisibility(true)
+                                    Toast.makeText(this,"Error al encontrar partida",Toast.LENGTH_LONG)
+                                }
+
+                            /*
+                            dbs.collection("jugadas")
+                                .document(jugadaId)
+                                .set(jugada)
+                                .addOnSuccessListener {
+                                    startGame()
+                                }
+                                .addOnFailureListener {
+                                    changeMenuVisibility(true)
+                                    Toast.makeText(this,"Error al encontrar partida",Toast.LENGTH_LONG)
+                                }*/
                         }
-                        .addOnFailureListener {
-                            Toast.makeText(this,"Error al encontrar partida",Toast.LENGTH_LONG)
-                        }
+                        break
+                    }
+                    if(!encontrado){
+                        crearNuevaJugada()
+                    }
+
                 }
             }
     }
@@ -105,23 +156,31 @@ class HomeActivity : AppCompatActivity() {
         listenerRegistration = dbs.collection("jugadas")
             .document(jugadaId)
             .addSnapshotListener { snapshot, error ->
-                if (snapshot != null) {
-                    if(snapshot.get("jugadorId") != ""){
+                if (snapshot != null) { //&& snapshot.exists()
+                    if(snapshot.get("jugadorDosId") != ""){
                         textViewJugadas.text = "¡Ingreso un retador! Comienza el juego"
-                        val handler = Handler()
-                        handler.postDelayed({
-                            startGame()
-                        },1500)
 
+                        animation_view.repeatCount = 0
+                        animation_view.setAnimation("checked_animation.json")
+                        animation_view.playAnimation()
+
+                        val handler = Handler()
+                        val r: Runnable = Runnable {
+                            startGame()
+                        }
+                        handler.postDelayed(r,2000)
                     }
                 }
             }
     }
 
     private fun startGame(){
-        var intent = Intent(this,GameActivity::class.java)
+        textViewJugadas.text = "Creando una jugada nueva ..."
+        listenerRegistration?.remove()
+        val intent = Intent(this, GameActivity::class.java)
         intent.putExtra("jugadaId",jugadaId) //creaba una constante
         startActivity(intent)
+        jugadaId = ""
     }
 
     private fun initProgresBar(){
@@ -141,9 +200,27 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        listenerRegistration?.remove()
+        if(jugadaId != ""){
+            dbs.collection("jugadas")
+                .document(jugadaId)
+                .delete()
+                .addOnCompleteListener {
+                    jugadaId = ""
+                }
+        }
+        super.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
-        changeMenuVisibility(true)
+        if(jugadaId != ""){
+            changeMenuVisibility(false)
+            esperarJugador()
+        }else {
+            changeMenuVisibility(true)
+        }
     }
 
 }
