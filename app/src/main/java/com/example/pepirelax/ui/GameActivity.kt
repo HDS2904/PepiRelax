@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
+import com.airbnb.lottie.LottieAnimationView
 import com.example.pepirelax.R
 import com.example.pepirelax.model.Jugada
 import com.example.pepirelax.model.User
@@ -96,7 +98,7 @@ class GameActivity : AppCompatActivity() {
             .document(jugadaId)
             .addSnapshotListener { snapshot, error ->
                 if(error != null){
-                    toast("Error al obtener jugada")
+                    toast("Error al obtener los datos de las jugadas")
                     return@addSnapshotListener
                 }
 
@@ -106,8 +108,8 @@ class GameActivity : AppCompatActivity() {
 
                     //extrallendo datos de firestores a un objeto jugada
                     val a1 = (snapshot.data?.get("jugadorUnoId") ?:"" ) as String
-                    val a2 = (snapshot.data?.get("JugadorDosId") ?:"" ) as String
-                    val a3: String =  snapshot.data?.get("selectedCells").toString()
+                    val a2 = (snapshot.data?.get("jugadorDosId")  ?:"" ) as String
+                    val a3 =  snapshot.data?.get("selectedCells").toString()
                     val items = a3.replace("\\[".toRegex(), "").replace("\\]".toRegex(), "").split(", ").toTypedArray()
                     val res: ArrayList<Int> = arrayListOf()
                     for (i in items.indices) {
@@ -140,7 +142,6 @@ class GameActivity : AppCompatActivity() {
             }
 
         }
-        UpdatePlayerUI()
     }
 
     private fun getPlayerNames(){
@@ -149,7 +150,16 @@ class GameActivity : AppCompatActivity() {
             .document(jugada.jugadorUnoId)
             .get()
             .addOnSuccessListener {
-                objectUser1 = it.toObject(User::class.java)!!
+                val a1 = it.data?.get("uid") as String
+                val a2 = it.data?.get("username") as String
+                val a3 =  it.data?.get("imgProfile") as String
+                val a4 =  it.data?.get("ngames").toString()
+                val a5 =  it.data?.get("point").toString()
+                Log.e("errorrrrrr:","$a4, $a5")
+                val a6 = Integer.parseInt(a4)
+                val a7 = Integer.parseInt(a5)
+                //objectUser1 = it.toObject(User::class.java)!!
+                objectUser1 = User(a1,a2,a3,a6,a7)
                 playerOneName = it.get("username").toString()
                 textViewPlayer1.text = playerOneName
                 if(jugada.jugadorUnoId == uid){
@@ -161,7 +171,16 @@ class GameActivity : AppCompatActivity() {
             .document(jugada.jugadorDosId)
             .get()
             .addOnSuccessListener {
-                objectUser2 = it.toObject(User::class.java)!!
+                val a1 = it.data?.get("uid") as String
+                val a2 = it.data?.get("username") as String
+                val a3 =  it.data?.get("imgProfile") as String
+                val a4 =  it.data?.get("ngames").toString()
+                val a5 =  it.data?.get("point").toString()
+                Log.e("errorrrrrr:","$a4, $a5")
+                val a6 = Integer.parseInt(a4)
+                val a7 = Integer.parseInt(a5)
+                //objectUser1 = it.toObject(User::class.java)!!
+                objectUser2 = User(a1,a2,a3,a6,a7)
                 playerTwoName = it.get("username").toString()
                 textViewPlayer2.text = playerTwoName
                 if(jugada.jugadorDosId == uid){
@@ -178,8 +197,8 @@ class GameActivity : AppCompatActivity() {
 
 
     fun casillaSeleccionada(view: View) {
-        if(!jugada.ganadorId.isEmpty()){
-            Toast.makeText(this,"La partida ha terminado",Toast.LENGTH_LONG)
+        if(jugada.ganadorId.isNotEmpty()){
+            toast("La partida ha terminado")
         }else {
             if(jugada.turnoJugadorUno && jugada.jugadorUnoId == uid){
                 //jungando jugador 1
@@ -205,14 +224,19 @@ class GameActivity : AppCompatActivity() {
                 jugada.selectedCells[posicionCasilla] = 2
             }
 
-            if(solucionEncontrada()){
-                jugada.ganadorId = uid
-                toast("Hay solución")
-            }else if (empateEncontrado()){
-                jugada.ganadorId = "EMPATE"
-                toast("Hay un empate")
-            }else {
-                cambioTurno()
+            when {
+                solucionEncontrada() -> {
+                    jugada.ganadorId = uid
+                    Log.e("ganador es","$uid")
+                    toast("Hay solución")
+                }
+                empateEncontrado() -> {
+                    jugada.ganadorId = "EMPATE"
+                    toast("Hay un empate")
+                }
+                else -> {
+                    cambioTurno()
+                }
             }
 
             //mandar la jugada a firestore
@@ -230,7 +254,6 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    //aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
     private fun UpdatePlayerUI(){
         if(jugada.turnoJugadorUno){
             textViewPlayer1.setTextColor(resources.getColor(R.color.colorPrimaryDark))
@@ -239,8 +262,8 @@ class GameActivity : AppCompatActivity() {
             textViewPlayer1.setTextColor(resources.getColor(R.color.grey))
             textViewPlayer2.setTextColor(resources.getColor(R.color.red))
         }
-        if(!jugada.ganadorId.isEmpty()){
-            ganadorId = jugadaId
+        if(jugada.ganadorId.isNotEmpty()){
+            ganadorId = jugada.ganadorId
             cuadroDialogoFin()
         }
     }
@@ -303,6 +326,12 @@ class GameActivity : AppCompatActivity() {
 
         val dialogOver: View = layoutInflater.inflate(R.layout.dialog_over,null)
 
+
+        // Obtenemos las referencias a los View components de nuestro layout
+        var txtPoints: TextView = dialogOver.findViewById(R.id.textPoints);
+        var txtInfo: TextView = dialogOver.findViewById(R.id.textInfo);
+        var gameOverAni: LottieAnimationView = dialogOver.findViewById(R.id.animationOver);
+
         //2.establecer caracteristicas al generador de dialogo
         builder?.setTitle("Game Over")
         builder?.setCancelable(false)
@@ -312,25 +341,25 @@ class GameActivity : AppCompatActivity() {
         when (ganadorId) {
             "EMPATE" -> {
                 actualizarRanking(1)
-                textInfo.text = "¡$nameJugador has empatado el juego!"
-                textPoints.text = "+1 Punto"
+                txtInfo.text = "¡$nameJugador has empatado el juego!"
+                txtPoints.text = "+1 Punto"
             }
             uid -> {
                 actualizarRanking(3)
-                textInfo.text = "¡$nameJugador has ganado el juego"
-                textPoints.text = "+3 Punto"
+                txtInfo.text = "¡$nameJugador has ganado el juego"
+                txtPoints.text = "+3 Punto"
             }
             else -> {
                 actualizarRanking(0)
-                textInfo.text = "¡$nameJugador has perdido el juego¡"
-                textPoints.text = "+0 Punto"
-                animationOver.setAnimation("down_animation.json")
+                txtInfo.text = "¡$nameJugador has perdido el juego¡"
+                txtPoints.text = "+0 Punto"
+                gameOverAni.setAnimation("down_animation.json")
             }
         }
 
         //iniciar la animacion ya que auto play es falso app:lottie_autoPlay="false"
         //animationOver.repeatCount = 0    //solo funciona si app:lottie_loop="false"
-        animationOver.playAnimation()
+        gameOverAni.playAnimation()
 
         //agregando botones al dialogo
         builder?.apply {
@@ -346,13 +375,23 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun actualizarRanking(puntos: Int) {
-        if(nameJugador==objectUser1.username){
-            objectUser1.point = objectUser1.point + puntos
+        val jugadorActualizar: User
+        if(nameJugador == objectUser1.username){
+            objectUser1.point = (objectUser1.point + puntos)
+            objectUser1.nGames = (objectUser1.nGames + 1)
+            jugadorActualizar = objectUser1
+        } else {
+            objectUser2.point = (objectUser2.point + puntos)
+            objectUser2.nGames = (objectUser2.nGames + 1)
+            jugadorActualizar = objectUser2
         }
 
-        dbs.collection("user")
+        dbs.collection("users")
             .document(uid)
-            .update()
+            .set(jugadorActualizar)
+            .addOnSuccessListener {
+                Log.e("Succes: ","Se actualizo los usuarios con sus puntos")
+            }
     }
 
 }

@@ -168,7 +168,7 @@ class HomeActivity : AppCompatActivity() {
                         val r: Runnable = Runnable {
                             startGame()
                         }
-                        handler.postDelayed(r,2000)
+                        handler.postDelayed(r,1500)
                     }
                 }
             }
