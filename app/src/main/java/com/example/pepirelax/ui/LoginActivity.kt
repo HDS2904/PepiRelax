@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.pepirelax.R
 import com.example.pepirelax.model.User
+import com.example.pepirelax.pruebas.CoreActivity
 import com.example.pepirelax.ui.fragment.SingInFragment
 import com.example.pepirelax.ui.fragment.SingUpFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -146,7 +147,7 @@ class LoginActivity : AppCompatActivity(),
     //accion despues de ingresar login
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
-            val intent = Intent(this,HomeActivity::class.java)
+            val intent = Intent(this,CoreActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         } else {
